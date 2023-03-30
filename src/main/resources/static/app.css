@@ -1,0 +1,26 @@
+body {
+    margin: 0px;
+    color: white;
+    background-color: black;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+article {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+table {
+    min-width: 25vw;
+}
+
+table,tr,td {
+    border: 1px solid white;
+}
