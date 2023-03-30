@@ -1,6 +1,6 @@
 # sample-progressive-app
 
-Source code for this blog post
+Source code for [this blog post](https://sombriks.com/blog/0048-progressive-vue-js-on-ssr-java/)
 
 ## Getting Started
 
