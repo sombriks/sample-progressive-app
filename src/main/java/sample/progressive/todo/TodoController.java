@@ -5,7 +5,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.List;
 
 @Controller
 @AllArgsConstructor
@@ -32,5 +35,11 @@ public class TodoController {
         service.removeTodo(id);
         return new ModelAndView("index")
                 .addObject("todos", service.listTodos());
+    }
+
+    @ResponseBody
+    @GetMapping("list")
+    public List<Todo> list(){
+        return service.listTodos();
     }
 }

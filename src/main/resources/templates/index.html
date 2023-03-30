@@ -4,12 +4,50 @@
   <title>TODO list</title>
   <meta charset="utf-8">
   <link rel="stylesheet" href="app.css"/>
+  <script type="text/javascript" src="webjars/petite-vue/0.4.1/dist/petite-vue.umd.js"></script>
+  <script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", () => {
+
+      const baseOptions = {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        }
+      };
+
+      PetiteVue.createApp({
+        todos: [[${todos}]],
+        descricao: "",
+        async newTodo() {
+          await fetch("/save", {
+            ...baseOptions,
+            body: `descricao=${this.descricao}`,
+          });
+          this.descricao = "";
+          await this.listTodos();
+        },
+        async removeTodo(id) {
+          await fetch("/", {
+            ...baseOptions,
+            body: `id=${id}`
+          })
+          await this.listTodos();
+        },
+        async listTodos() {
+          const result = await fetch("/list", {
+            ...baseOptions, method: "GET"
+          })
+          this.todos = await result.json();
+        }
+      }).mount();
+    });
+  </script>
 </head>
 <body>
 <main>
   <article>
     <h1>My todo list</h1>
-    <table>
+    <table v-scope>
       <thead>
       <tr>
         <th>Description</th>
@@ -17,27 +55,32 @@
       </tr>
       <tr>
         <th colspan="2">
-          <form th:action="@{/save}" method="post">
-            <input name="descricao" type="text"/>
-            <input type="submit" value="new"/>
-          </form>
+          <input name="descricao" type="text" v-model="descricao"/>
+          <button @click="newTodo()">new</button>
         </th>
       </tr>
       </thead>
       <tbody>
-      <tr th:each="t : ${todos}">
+      <!-- from server -->
+      <tr v-if="!todos" th:each="t : ${todos}">
         <td th:text="${t.descricao}"></td>
         <td>
-          <form th:action="@{/}" method="post">
-            <input type="hidden" name="id" th:value="${t.id}"/>
-            <input type="submit" value="done"/>
-          </form>
+          <input type="hidden" name="id" th:value="${t.id}"/>
+          <!--          <button th:@click="removeTodo(${t.id})">done</button>-->
+        </td>
+      </tr>
+      <!-- from hydration -->
+      <tr v-for="t in todos" :key="t.id">
+        <td>{{t.descricao}}</td>
+        <td>
+          <button @click="removeTodo(t.id)">done</button>
         </td>
       </tr>
       </tbody>
       <tfoot>
       <tr>
-        <td colspan="2">There are <span th:text="${todos.size()}"></span> tasks</td>
+        <td v-if="!todos" colspan="2">There are <span th:text="${todos.size()}"></span> tasks</td>
+        <td v-else colspan="2">There are {{todos.length}} tasks</td>
       </tr>
       </tfoot>
     </table>
